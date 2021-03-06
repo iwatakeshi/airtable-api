@@ -1,5 +1,5 @@
 export default interface Thumbnail {
-  url: string;
-  width: number;
-  height: number;
+  url: string
+  width: number
+  height: number
 }

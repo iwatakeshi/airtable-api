@@ -1,34 +1,34 @@
-import nock, { Scope } from 'nock';
-import qs from 'qs';
-import recordsResponse from '../fixtures/records';
-import filterByFormulaResponse from '../fixtures/records.filterbyformula';
-import pageSizeResponse from '../fixtures/records.pageSize-1';
-import offset1Response from '../fixtures/records.pageSize-1-offset-1';
-import offset2Resopnse from '../fixtures/records.pageSize-1-offset-2';
-import sortResponse from '../fixtures/records.sort';
-import createRequestBody from '../fixtures/records.create';
-import updateRequestBody from '../fixtures/records.update';
-import { matches } from 'lodash';
-import { QueryParams } from '../../src/types';
+import nock, { Scope } from 'nock'
+import qs from 'qs'
+import recordsResponse from '../fixtures/records'
+import filterByFormulaResponse from '../fixtures/records.filterbyformula'
+import pageSizeResponse from '../fixtures/records.pageSize-1'
+import offset1Response from '../fixtures/records.pageSize-1-offset-1'
+import offset2Resopnse from '../fixtures/records.pageSize-1-offset-2'
+import sortResponse from '../fixtures/records.sort'
+import createRequestBody from '../fixtures/records.create'
+import updateRequestBody from '../fixtures/records.update'
+import { matches } from 'lodash'
+import { QueryParams } from '../../src/types'
 
-const BASE_ID = 'abc';
-const TABLE_NAME = 'My Table';
-const API_VERSION = '0';
-const API_KEY = 'key123';
+const BASE_ID = 'abc'
+const TABLE_NAME = 'My Table'
+const API_VERSION = '0'
+const API_KEY = 'key123'
 const TABLE_PATH = `/v${API_VERSION}/${BASE_ID}/${encodeURIComponent(
   TABLE_NAME
-)}`;
+)}`
 function checkQuery(query: QueryParams) {
-  return (param: any) => qs.stringify(param) === qs.stringify(query);
+  return (param: any) => qs.stringify(param) === qs.stringify(query)
 }
 
-export type ScopeAndPath = { scope: Scope; path: string };
+export type ScopeAndPath = { scope: Scope; path: string }
 
 export function start(): ScopeAndPath {
   const scope = nock('http://localhost').matchHeader(
     'Authorization',
     `Bearer ${API_KEY}`
-  );
+  )
   // TODO: Once the pipeline operator lands in JS, convert this to:
   // allRecords(...)
   // | queryRecords
@@ -48,16 +48,16 @@ export function start(): ScopeAndPath {
         )
       )
     )
-  );
+  )
 }
 
 // Return all records
 export function allRecords(scope: Scope, path: string): ScopeAndPath {
-  scope.get(path).reply(200, recordsResponse);
+  scope.get(path).reply(200, recordsResponse)
   return {
     scope,
     path,
-  };
+  }
 }
 
 // Query records
@@ -68,11 +68,11 @@ export function queryRecords({ scope, path }: ScopeAndPath): ScopeAndPath {
     .get(path)
     .query(checkQuery({ fields: ['Name', 'Client'] }))
     .reply(200, {
-      records: recordsResponse.records.map(record => {
+      records: recordsResponse.records.map((record) => {
         return {
           Name: record.fields.Name,
           Client: record.fields.Client,
-        };
+        }
       }),
     })
 
@@ -97,7 +97,7 @@ export function queryRecords({ scope, path }: ScopeAndPath): ScopeAndPath {
     // sort
     .get(path)
     .query(checkQuery({ sort: [{ field: 'Name', direction: 'desc' }] }))
-    .reply(200, sortResponse);
+    .reply(200, sortResponse)
 
   // TODO: view
 
@@ -106,12 +106,12 @@ export function queryRecords({ scope, path }: ScopeAndPath): ScopeAndPath {
   // TODO: timeZone
 
   // TODO: user locale
-  return { scope, path };
+  return { scope, path }
 }
 
 // Auto-paginate records (test)
 export function paginatedRecords({ scope, path }: ScopeAndPath): ScopeAndPath {
-  const params = { pageSize: 1 };
+  const params = { pageSize: 1 }
   scope
     .get(path)
     .query(params)
@@ -121,63 +121,67 @@ export function paginatedRecords({ scope, path }: ScopeAndPath): ScopeAndPath {
     .reply(200, offset1Response)
     .get(path)
     .query({ ...params, offset: offset1Response.offset })
-    .reply(200, offset2Resopnse);
+    .reply(200, offset2Resopnse)
 
   return {
     scope,
     path,
-  };
+  }
 }
 
 export function findRecord({ scope, path }: ScopeAndPath): ScopeAndPath {
   scope.get(`${path}/recABcLKRaQWszKp`).reply(200, () => {
     return recordsResponse.records.filter(
-      record => record.id === 'recABcLKRaQWszKp'
-    )[0];
-  });
-  return { scope, path };
+      (record) => record.id === 'recABcLKRaQWszKp'
+    )[0]
+  })
+  return { scope, path }
 }
 
 export function createRecord({ scope, path }: ScopeAndPath): ScopeAndPath {
   scope
     .post(path, matches([createRequestBody[0]]))
-    .reply(200, { records: [createRequestBody[0]] });
-  return { scope, path };
+    .reply(200, { records: [createRequestBody[0]] })
+  return { scope, path }
 }
 
 export function createRecords({ scope, path }: ScopeAndPath): ScopeAndPath {
   scope
     .post(path, matches(createRequestBody))
-    .reply(200, { records: createRequestBody });
-  return { scope, path };
+    .reply(200, { records: createRequestBody })
+  return { scope, path }
 }
 
 export function updateRecord({ scope, path }: ScopeAndPath): ScopeAndPath {
   scope.patch(path, matches([updateRequestBody[0]])).reply(200, {
     records: [updateRequestBody[0]],
-  });
-  return { scope, path };
+  })
+  return { scope, path }
 }
 
 export function updateRecords({ scope, path }: ScopeAndPath): ScopeAndPath {
   scope
     .patch(path, matches(updateRequestBody))
-    .reply(200, { records: updateRequestBody });
-  return { scope, path };
+    .reply(200, { records: updateRequestBody })
+  return { scope, path }
 }
 
 export function deleteRecord({ scope, path }: ScopeAndPath): ScopeAndPath {
-  const ids = ['recABcLKRaQWszKp'];
+  const ids = ['recABcLKRaQWszKp']
   scope.delete(path, matches(ids)).reply(200, {
-    records: recordsResponse.records.filter(record => ids.includes(record.id)),
-  });
-  return { scope, path };
+    records: recordsResponse.records.filter((record) =>
+      ids.includes(record.id)
+    ),
+  })
+  return { scope, path }
 }
 
 export function deleteRecords({ scope, path }: ScopeAndPath): ScopeAndPath {
-  const ids = ['recABcLKRaQWszKp', 'recAtELIMS1xJOTI'];
+  const ids = ['recABcLKRaQWszKp', 'recAtELIMS1xJOTI']
   scope.delete(path, matches(ids)).reply(200, {
-    records: recordsResponse.records.filter(record => ids.includes(record.id)),
-  });
-  return { scope, path };
+    records: recordsResponse.records.filter((record) =>
+      ids.includes(record.id)
+    ),
+  })
+  return { scope, path }
 }

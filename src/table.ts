@@ -49,9 +49,11 @@ export default class Table {
   }
 
   private get baseUrl() {
-    return `${this.options.endpointUrl}/v${this.options.apiVersionMajor}/${encodeURIComponent(
-      this.options.baseId
-    )}/${encodeURIComponent(this.name)}`
+    return `${this.options.endpointUrl}/v${
+      this.options.apiVersionMajor
+    }/${encodeURIComponent(this.options.baseId)}/${encodeURIComponent(
+      this.name
+    )}`
   }
 
   /**
@@ -102,7 +104,9 @@ export default class Table {
    *  }
    * }
    */
-  async *list<T = unknown>(params: QueryParams = {}): AsyncGenerator<Record<T>[], void, unknown> {
+  async *list<T = unknown>(
+    params: QueryParams = {}
+  ): AsyncGenerator<Record<T>[], void, unknown> {
     let result = await this.records<T>(params)
     yield result.records
 
@@ -127,7 +131,10 @@ export default class Table {
    */
   async findRecord<T = unknown>(id: string): Promise<Record<T>> {
     try {
-      const { data } = await axios.get<Record<T>>(`${this.baseUrl}/${id}`, this.#axiosConfig)
+      const { data } = await axios.get<Record<T>>(
+        `${this.baseUrl}/${id}`,
+        this.#axiosConfig
+      )
       return data
     } catch (error) {
       const { response } = error as AxiosError
@@ -289,12 +296,17 @@ export default class Table {
    * // Delete the records
    * await table.deleteRecords(['record_id', 'record_id_2'])
    */
-  async deleteRecords(records: DeleteRecordsInput): Promise<DeleteRecordResponse> {
+  async deleteRecords(
+    records: DeleteRecordsInput
+  ): Promise<DeleteRecordResponse> {
     try {
-      const { data } = await axios.delete<DeleteRecordResponse>(`${this.baseUrl}`, {
-        ...this.#axiosConfig,
-        data: records,
-      })
+      const { data } = await axios.delete<DeleteRecordResponse>(
+        `${this.baseUrl}`,
+        {
+          ...this.#axiosConfig,
+          data: records,
+        }
+      )
       return data
     } catch (error) {
       const { response } = error as AxiosError

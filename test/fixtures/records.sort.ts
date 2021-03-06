@@ -1024,4 +1024,4 @@ export default {
       createdTime: '2020-06-11T01:30:11.000Z',
     },
   ],
-};
+}

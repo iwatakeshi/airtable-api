@@ -1,4 +1,4 @@
-import { TestRecord } from './records';
+import { TestRecord } from './records'
 
 export default [
   {
@@ -85,4 +85,4 @@ export default [
       },
     },
   },
-] as Omit<TestRecord, 'createdTime'>[];
+] as Omit<TestRecord, 'createdTime'>[]

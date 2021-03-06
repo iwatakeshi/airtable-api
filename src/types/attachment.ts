@@ -1,14 +1,14 @@
-import Thumbnail from './thumbnail';
+import Thumbnail from './thumbnail'
 
 export default interface Attachment {
-  id: string;
-  url: string;
-  filename: string;
-  size: number;
-  type: string;
+  id: string
+  url: string
+  filename: string
+  size: number
+  type: string
   thumbnails?: {
-    small: Thumbnail;
-    large: Thumbnail;
-    full: Thumbnail;
-  };
+    small: Thumbnail
+    large: Thumbnail
+    full: Thumbnail
+  }
 }

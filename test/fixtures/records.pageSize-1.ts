@@ -33,4 +33,4 @@ export default {
     },
   ],
   offset: 'itrF4SrS8wlfkipsW/recABcfKRUaQWszKp',
-};
+}

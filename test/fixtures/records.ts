@@ -1,17 +1,17 @@
-import { Record } from '../../src';
-import { ProjectTeamMember } from './types';
+import { Record } from '../../src'
+import { ProjectTeamMember } from './types'
 
 export type TestRecord = Record<{
-  Name: string;
-  Client: string[];
-  Category: string;
-  Complete: boolean;
-  'Project team': ProjectTeamMember[];
-  'Due date': string;
-  'Kickoff date': string;
-  Notes: string;
-  'Project lead': ProjectTeamMember;
-}>;
+  Name: string
+  Client: string[]
+  Category: string
+  Complete: boolean
+  'Project team': ProjectTeamMember[]
+  'Due date': string
+  'Kickoff date': string
+  Notes: string
+  'Project lead': ProjectTeamMember
+}>
 
 export default {
   records: [
@@ -1039,4 +1039,4 @@ export default {
       createdTime: '2020-06-11T01:55:36.000Z',
     },
   ] as TestRecord[],
-};
+}
