@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { createError } from './error'
 import { BaseOptions } from './base'
-import * as rax from 'retry-axios'
+import rax from 'axios-retry'
 import qs from 'qs'
 import {
   QueryParams,
@@ -17,8 +17,6 @@ import {
   UpdateRecordInput,
   DeleteRecordInput,
 } from './types'
-
-rax.attach(axios)
 
 export type TableOptions = BaseOptions & {
   baseId: string
@@ -42,10 +40,8 @@ export default class Table {
       headers: {
         Authorization: `Bearer ${this.options.apiKey}`,
       },
-      raxConfig: {
-        retry: 3,
-      },
     }
+    rax(axios, { retries: 3 })
   }
 
   private get baseUrl() {

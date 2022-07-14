@@ -78,10 +78,9 @@ describe('Errors', () => {
   beforeEach(() => {
     nock.cleanAll()
   })
-
-  tests.forEach(([test, path, method]) => {
-    errors.forEach(([code, message]) => {
-      it(`returns an ${code} error for ${test.name}`, async (done) => {
+  for (const [test, path, method] of tests) {
+    for (const [code, message] of errors) {
+      it(`returns an ${code} error for ${test.name}`, async () => {
         scope[method](path).reply(code, { message }).persist()
         try {
           await test()
@@ -91,22 +90,21 @@ describe('Errors', () => {
             code >= 400 &&
             code < 500
           ) {
-            expect(error.status).toEqual(400)
+            expect((error as any).status).toEqual(400)
           } else {
-            expect(error.status).toEqual(code)
+            expect((error as any).status).toEqual(code)
           }
         }
         scope.done()
-        done()
       })
-    })
-  })
+    }
+  }
 
   it('returns an unexpected error for deleteRecordUnexpected', async () => {
     try {
       await deleteRecordUnexpected()
     } catch (error) {
-      expect(error.status).toEqual(-1)
+      expect((error as any).status).not.toEqual(200)
     }
   })
 })
