@@ -46,6 +46,11 @@ export type UpdateRecordsInput<T> = Array<{
   fields: Field<T>
 }>
 
+export type UpdateRecordsInputUpsert<T> = Array<{
+  id?: string
+  fields: Field<T>
+}>
+
 export type DeleteRecordInput = string
 
 export type DeleteRecordsInput = string[]
@@ -58,6 +63,12 @@ export type TableRecordResponse<T> = {
 export type CreatedRecordResponse<T> = Omit<TableRecordResponse<T>, 'offset'>
 
 export type UpdatedRecordResponse<T> = Omit<TableRecordResponse<T>, 'offset'>
+
+export type UpdatedRecordResponseUpsert<T> = Omit<TableRecordResponse<T>, 'offset'> & {
+  createdRecords: string[]
+} & {
+  updatedRecords: string[]
+}
 
 export type DeleteRecordResponse = {
   records: Array<{
