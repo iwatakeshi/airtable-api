@@ -16,6 +16,8 @@ import {
   CreateRecordInput,
   UpdateRecordInput,
   DeleteRecordInput,
+  UpdateRecordsInputUpsert,
+  UpdatedRecordResponseUpsert,
 } from './types'
 
 export type TableOptions = BaseOptions & {
@@ -45,11 +47,10 @@ export default class Table {
   }
 
   private get baseUrl() {
-    return `${this.options.endpointUrl}/v${
-      this.options.apiVersionMajor
-    }/${encodeURIComponent(this.options.baseId)}/${encodeURIComponent(
-      this.name
-    )}`
+    return `${this.options.endpointUrl}/v${this.options.apiVersionMajor
+      }/${encodeURIComponent(this.options.baseId)}/${encodeURIComponent(
+        this.name
+      )}`
   }
 
   /**
@@ -73,9 +74,11 @@ export default class Table {
       const { data } = await axios.get<TableRecordResponse<T>>(this.baseUrl, {
         ...this.#axiosConfig,
         params: offset ? { offset, ...params } : params,
-        paramsSerializer: (param) => qs.stringify(param),
+        paramsSerializer: {
+          encode: params => qs.stringify(params)
+        },
       })
-      return data
+      return data as any
     } catch (error) {
       const { response } = error as AxiosError
       throw createError(response?.status, response?.statusText)
@@ -265,6 +268,58 @@ export default class Table {
   }
 
   /**
+   * Updates a batch of records in the table using upsert. If a record does not exist, it will be created.
+   * @param fieldsToMergeOn 
+   * @param records 
+   * @example
+   * // Create the base
+   * const base = Airtable({ apiKey: 'MY_API_KEY' }).base('BASE_ID')
+   * // Create the table
+   * const table = base.table('My Table')
+   * // Update the records
+   * await table.updateRecordsUsingUpsert(['Name'], [{
+   * id: 'record_id'
+   * fields: {
+   *   "Name": "Coffee Deluxe",
+   *  "Price": "$0.00"
+   * }
+   * }, {
+   * id: 'record_id_2'
+   * fields: {
+   *  "Name": "Coffee Max",
+   * "Price": "$0.00"
+   * }
+   * }])
+   */
+  async updateRecordsUsingUpsert<T = unknown, U = unknown>(
+    fieldsToMergeOn: string[],
+    records: UpdateRecordsInputUpsert<T>,
+    returnFieldsByFieldId = false,
+    typecast = false
+  ): Promise<UpdatedRecordResponseUpsert<U>> {
+    try {
+      const { data } = await axios.patch<
+        UpdatedRecordResponseUpsert<U>
+      >(
+        `${this.baseUrl}`,
+        {
+          performUpsert: {
+            fieldsToMergeOn
+          },
+          records,
+          typecast,
+          returnFieldsByFieldId,
+        },
+        this.#axiosConfig
+      )
+      return data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw createError(response?.status, response?.statusText)
+    }
+  }
+
+  /**
    * Removes a single record from the table.
    * @param record The record to delete
    * @example
@@ -277,7 +332,16 @@ export default class Table {
    * await table.deleteRecord('record_id')
    */
   async deleteRecord(record: DeleteRecordInput): Promise<DeleteRecordResponse> {
-    return this.deleteRecords([record])
+    try {
+      const { data } = await axios.delete<DeleteRecordResponse>(
+        `${this.baseUrl}/${record}`,
+        this.#axiosConfig
+      )
+      return data
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw createError(response?.status, response?.statusText)
+    }
   }
 
   /**
@@ -309,4 +373,23 @@ export default class Table {
       throw createError(response?.status, response?.statusText)
     }
   }
+
+  async sync(apiEndpointSyncId: string, csv: string): Promise<void> {
+    try {
+      await axios.post(
+        `${this.baseUrl}/sync/${apiEndpointSyncId}`,
+        csv,
+        {
+          ...this.#axiosConfig,
+          headers: {
+            'Content-Type': 'text/csv',
+          },
+        }
+      )
+    } catch (error) {
+      const { response } = error as AxiosError
+      throw createError(response?.status, response?.statusText)
+    }
+  }
+
 }
