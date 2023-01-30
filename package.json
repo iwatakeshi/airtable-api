@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
   "license": "MIT",
-  "main": "dist/index",
+  "main": "dist-cjs/index.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
@@ -11,55 +11,42 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "yarn node --experimental-vm-modules $(yarn bin jest)",
-    "lint": "tsdx lint",
-    "prepare": "husky install",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "build": "tsc && babel dist --out-dir dist-cjs",
+    "start": "node dist-cjs/index.js",
+    "test": "jest"
   },
-  "peerDependencies": {},
   "name": "@iwatakeshi/airtable-api",
   "author": "Takeshi Iwana",
   "repository": "github:iwatakeshi/airtable-api",
-  "module": "dist/airtable-api.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/airtable-api.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/airtable-api.esm.js",
-      "limit": "10 KB"
-    }
-  ],
+  "module": "dist/index.js",
   "devDependencies": {
-    "@babel/core": "^7.18.6",
-    "@babel/preset-env": "^7.18.6",
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
     "@babel/preset-typescript": "^7.18.6",
-    "@size-limit/preset-small-lib": "^7.0.8",
-    "@types/jest": "^28.1.5",
-    "@types/lodash": "^4.14.182",
+    "@size-limit/preset-small-lib": "^8.1.2",
+    "@types/jest": "^29.4.0",
+    "@types/lodash": "^4.14.191",
     "@types/qs": "^6.9.7",
-    "babel-jest": "^28.1.3",
-    "husky": "^8.0.1",
-    "jest": "^28.1.3",
-    "jest-environment-jsdom": "^28.1.3",
-    "nock": "^13.2.8",
-    "size-limit": "^7.0.8",
-    "ts-jest": "^28.0.5",
-    "tsdx": "github:iwatakeshi/tsdx",
-    "tslib": "^2.4.0",
-    "typescript": "^4.7.4"
+    "@vespaiach/axios-fetch-adapter": "^0.3.1",
+    "axios-mock-adapter": "^1.21.2",
+    "axios-response-mock": "^0.2.2-alpha.1",
+    "babel-jest": "^29.4.0",
+    "husky": "^8.0.3",
+    "jest": "^29.4.0",
+    "nock": "^13.3.0",
+    "size-limit": "^8.1.2",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4"
   },
   "dependencies": {
-    "axios": "^0.27.2",
-    "axios-retry": "^3.3.1",
+    "axios": "^1.2.5",
+    "axios-retry": "^3.4.0",
     "lodash": "^4.17.21",
     "qs": "^6.11.0",
-    "retry-axios": "^3.0.0",
-    "tslib": "^2.4.0"
+    "retry-axios": "^3.0.0"
   },
   "publishConfig": {
     "access": "public"
